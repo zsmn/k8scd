@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio
+  namespace: argocd
+spec:
+  project: default #every application belongs to a single project
+
+  source:
+    repoURL: https://github.com/zsmn/k8scd
+    targetRevision: HEAD
+    path: k8s/config/istio
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: istiod
+      jqPathExpressions:
+      - .spec.template.spec.containers[].env[].valueFrom.resourceFieldRef.divisor
+
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
