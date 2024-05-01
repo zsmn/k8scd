@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: vivaldi-api
+  name: monitoring
   namespace: argocd
 spec:
   project: default #every application belongs to a single project
@@ -9,10 +9,12 @@ spec:
   source:
     repoURL: https://github.com/zsmn/k8scd
     targetRevision: HEAD
-    path: k8s/config/train-ticket
+    path: k8s/config/monitoring
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: trainticket
+    namespace: monitoring
 
   syncPolicy:
     syncOptions:
