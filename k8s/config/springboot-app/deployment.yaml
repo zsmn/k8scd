@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: zhpa-springboot-app
+  name: zhpa-springboot-app
+spec:
+  selector:
+    matchLabels:
+      run: zhpa-springboot-app
+  template:
+    metadata:
+      labels:
+        run: zhpa-springboot-app
+    spec:
+      containers:
+      - image: zsmn/zhpa-application:v0.0.1
+        imagePullPolicy: Always
+        name: zhpa-springboot-app
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 200m
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zhpa-springboot-app
+  namespace: zhpa-springboot-app
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: zhpa-springboot-app
+  sessionAffinity: None
+  type: ClusterIP

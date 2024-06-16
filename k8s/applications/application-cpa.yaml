@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cpa
+  namespace: argocd
+spec:
+  project: default #every application belongs to a single project
+  source:
+    repoURL: https://github.com/zsmn/k8scd
+    targetRevision: HEAD
+    path: k8s/config/cpa
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      selfHeal: true
+      prune: true
