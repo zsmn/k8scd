@@ -8,21 +8,36 @@ spec:
   selector:
     matchLabels:
       run: zhpa-springboot-app
+  #replicas: 2
   template:
     metadata:
       labels:
         run: zhpa-springboot-app
     spec:
       containers:
-      - image: zsmn/zhpa-application:v0.0.1
+      - image: zsmn/zhpa-application:v0.0.2
         imagePullPolicy: Always
         name: zhpa-springboot-app
         ports:
         - containerPort: 8080
-          protocol: TCP
         resources:
           requests:
             cpu: 200m
+            memory: 400Mi
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 2
+          failureThreshold: 5
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 2
+          failureThreshold: 5
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -30,12 +45,44 @@ kind: Service
 metadata:
   name: zhpa-springboot-app
   namespace: zhpa-springboot-app
+  labels:
+    version: v1
+    run: zhpa-springboot-app
+    service: zhpa-springboot-app
 spec:
   ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
+    - port: 8080
+      name: http
   selector:
     run: zhpa-springboot-app
-  sessionAffinity: None
-  type: ClusterIP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: zhpa-springboot-app-gateway
+  namespace: zhpa-springboot-app
+spec:
+  selector:
+    app: istio-ingress
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: zhpa-springboot-app-virtualservice
+  namespace: zhpa-springboot-app
+spec:
+  hosts: 
+  - '*'
+  gateways:
+  - zhpa-springboot-app-gateway
+  http:
+  - route:
+    - destination:
+        host: zhpa-springboot-app
