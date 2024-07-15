@@ -154,3 +154,31 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+    - job_name: zhpa-springboot-app
+      metrics_path: /actuator/prometheus
+      scrape_interval: 5s
+      scrape_timeout: 5s
+      scheme: http
+      follow_redirects: true
+      enable_http2: true
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_container_port_number]
+        regex: "8080"
+        replacement: $1
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_name]
+        replacement: $1
+        action: replace
+        target_label: pod
+      - source_labels: [__meta_kubernetes_namespace]
+        replacement: $1
+        action: replace
+        target_label: namespace
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+          - zhpa-springboot-app
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true

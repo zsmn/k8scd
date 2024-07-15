@@ -15,7 +15,7 @@ spec:
         run: zhpa-springboot-app
     spec:
       containers:
-      - image: zsmn/zhpa-application:v0.0.2
+      - image: zsmn/zhpa-application:v0.0.3
         imagePullPolicy: Always
         name: zhpa-springboot-app
         ports:
