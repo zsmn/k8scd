@@ -8,8 +8,8 @@ spec:
       containers:
       - name: zhpa-cpa
         #image: zsmn/zhpa-basic-cpa:v0.0.1
-        image: zsmn/zhpa-astar-cpa:v0.0.4
-        #image: zsmn/zhpa-hpa-cpa:v0.0.2
+        #image: zsmn/zhpa-astar-cpa:v0.0.4
+        image: zsmn/zhpa-hpa-cpa:v0.0.2
         imagePullPolicy: Always
   scaleTargetRef:
     apiVersion: apps/v1
