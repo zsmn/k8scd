@@ -72,6 +72,9 @@ def high_voltage_state(average_utilization, last_average_utilization, current_re
 def optimum_voltage_state(current_replicas):
     return current_replicas
 
+# hpa: desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]
+# fonte: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+
 def evaluate(spec):
     # Only expect 1 metric provided
     if len(spec["metrics"]) != 1:
