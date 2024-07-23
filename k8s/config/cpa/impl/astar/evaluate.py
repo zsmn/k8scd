@@ -29,17 +29,21 @@ import math
 # }
 
 target_average_utilization = 70
+error_margin = 1.0
 
 def main():
     # Parse JSON into a dict
     spec = json.loads(sys.stdin.read())
     evaluate(spec)
 
-def write_last_metric_to_file(file_path, new_content):
+def exponential_moving_average(current_value: float, previous_ema: float, alpha=0.3):
+    return alpha * current_value + (1 - alpha) * previous_ema
+
+def write_last_metric_to_file(file_path: str, new_content):
     with open(file_path, 'w') as file:
         file.write(str(new_content))
 
-def read_last_metric_from_file(file_path, default_value=0.0):
+def read_last_metric_from_file(file_path: str, default_value=0.0):
     try:
         with open(file_path, 'r') as file:
             content = file.read().strip()
@@ -57,23 +61,17 @@ def read_last_metric_from_file(file_path, default_value=0.0):
     except IOError:
         return default_value
 
-def low_voltage_stage(average_utilization, last_average_utilization, current_replicas):
-    if average_utilization > last_average_utilization:
+def low_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int):
+    if average_resource_utilization > last_average_resource_utilization + error_margin:
         return current_replicas + 1
     else:
         return current_replicas / 2
 
-def high_voltage_state(average_utilization, last_average_utilization, current_replicas):
-    if average_utilization < last_average_utilization:
+def high_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int):
+    if average_resource_utilization < last_average_resource_utilization - error_margin:
         return current_replicas - 1
     else:
         return current_replicas * 2
-
-def optimum_voltage_state(current_replicas):
-    return current_replicas
-
-# hpa: desiredReplicas = ceil[currentReplicas * ( currentMetricValue / desiredMetricValue )]
-# fonte: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 
 def evaluate(spec):
     # Only expect 1 metric provided
@@ -95,12 +93,10 @@ def evaluate(spec):
     target_replicas = current_replicas
 
     # Runs AsTAR algorithm
-    if average_utilization > target_average_utilization:
-        target_replicas = high_voltage_state(average_utilization, last_metric, current_replicas)
-    elif average_utilization < target_average_utilization:
-        target_replicas = low_voltage_stage(average_utilization, last_metric, current_replicas)
+    if average_utilization >= target_average_utilization:
+        target_replicas = high_resource_usage(average_utilization, last_metric, current_replicas)
     else:
-        target_replicas = optimum_voltage_state()
+        target_replicas = low_resource_usage(average_utilization, last_metric, current_replicas)
 
     # Build JSON dict with targetReplicas
     evaluation = {}
@@ -110,7 +106,7 @@ def evaluate(spec):
     sys.stdout.write(json.dumps(evaluation))
 
     # Write last metric to file
-    write_last_metric_to_file("last_metric.txt", average_utilization)
+    write_last_metric_to_file("last_metric.txt", exponential_moving_average(average_utilization, last_metric))
 
 if __name__ == "__main__":
     main()
