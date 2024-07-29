@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: onlineboutique
+  namespace: argocd
+spec:
+  project: default #every application belongs to a single project
+
+  source:
+    repoURL: https://github.com/zsmn/k8scd
+    targetRevision: HEAD
+    path: k8s/config/onlineboutique
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: onlineboutique
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true
