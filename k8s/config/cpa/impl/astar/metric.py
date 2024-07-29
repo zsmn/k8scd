@@ -71,12 +71,14 @@ def metric(spec):
     for _, pod_info in pod_metrics_info.items():
         total_utilization += pod_info["Value"]
     # Calculate the average utilization
-    average_utilization = total_utilization / current_replicas
+    average_utilization = ((total_utilization / current_replicas) / resource["requests"][list(resource["requests"].keys())[0]]) * 100.0
     # Generate some JSON to pass to the evaluator
     sys.stdout.write(json.dumps(
         {
             "current_replicas": current_replicas,
-            "average_utilization": average_utilization
+            "average_utilization": average_utilization,
+            "target_utilization": float(spec["resource"]["metadata"]["labels"]["targetResourceUsage"]),
+            "error_margin": float(spec["resource"]["metadata"]["labels"]["resourceErrorMargin"])
         }
     ))
 

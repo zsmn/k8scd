@@ -28,9 +28,6 @@ import math
 #   ]
 # }
 
-target_average_utilization = 70
-error_margin = 1.0
-
 def main():
     # Parse JSON into a dict
     spec = json.loads(sys.stdin.read())
@@ -61,13 +58,13 @@ def read_last_metric_from_file(file_path: str, default_value=0.0):
     except IOError:
         return default_value
 
-def low_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int):
+def low_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int, error_margin: float):
     if average_resource_utilization > last_average_resource_utilization + error_margin:
         return current_replicas + 1
     else:
         return current_replicas / 2
 
-def high_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int):
+def high_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int, error_margin: float):
     if average_resource_utilization < last_average_resource_utilization - error_margin:
         return current_replicas - 1
     else:
@@ -88,15 +85,19 @@ def evaluate(spec):
     # Get the average utilization from the metric
     average_utilization = metric_value["average_utilization"]
 
+    # Get target and error margins
+    target_average_utilization = metric_value["target_utilization"]
+    error_margin = metric_value["error_margin"]
+
     # Load the last metric from file
     last_metric = read_last_metric_from_file("last_metric.txt", average_utilization)
     target_replicas = current_replicas
 
     # Runs AsTAR algorithm
     if average_utilization >= target_average_utilization:
-        target_replicas = high_resource_usage(average_utilization, last_metric, current_replicas)
+        target_replicas = high_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
     else:
-        target_replicas = low_resource_usage(average_utilization, last_metric, current_replicas)
+        target_replicas = low_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
 
     # Build JSON dict with targetReplicas
     evaluation = {}

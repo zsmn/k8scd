@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   labels:
     run: zhpa-springboot-app
+    targetResourceUsage: "50"
+    resourceErrorMargin: "2"
   name: zhpa-springboot-app
 spec:
   selector:
