@@ -1,0 +1,27 @@
+apiVersion: custompodautoscaler.com/v1
+kind: CustomPodAutoscaler
+metadata:
+  name: cpa
+spec:
+  template:
+    spec:
+      containers:
+      - name: zhpa-cpa
+        #image: zsmn/zhpa-basic-cpa:v0.0.1
+        image: zsmn/zhpa-astar-cpa:v0.0.12
+        #image: zsmn/zhpa-hpa-cpa:v0.0.2
+        imagePullPolicy: Always
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  roleRequiresMetricsServer: true
+  config:
+    - name: interval
+      value: "15000"
+    - name: maxReplicas
+      value: "5"
+    - name: logVerbosity
+      value: "3"
+    - name: downscaleStabilization
+      value: "60"
