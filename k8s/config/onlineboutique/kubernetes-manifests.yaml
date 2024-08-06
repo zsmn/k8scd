@@ -41,7 +41,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: currencyservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -102,7 +102,7 @@ spec:
   selector:
     matchLabels:
       app: loadgenerator
-  replicas: 1
+  replicas: 0
   template:
     metadata:
       labels:
@@ -150,7 +150,7 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
       containers:
-      - name: main
+      - name: loadgenerator
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -163,7 +163,7 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
         - name: USERS
-          value: "10"
+          value: "200"
         resources:
           requests:
             cpu: 300m
@@ -200,7 +200,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: productcatalogservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -272,7 +272,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-        - name: server
+        - name: checkoutservice
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -354,7 +354,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: shippingservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -428,7 +428,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: cartservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -500,7 +500,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: redis
+      - name: redis-cart
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -571,7 +571,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: emailservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -646,7 +646,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: paymentservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -720,7 +720,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-        - name: server
+        - name: frontend
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -847,7 +847,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: recommendationservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -911,7 +911,6 @@ spec:
   selector:
     matchLabels:
       app: adservice
-  replicas: 2
   template:
     metadata:
       labels:
@@ -925,7 +924,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      - name: server
+      - name: adservice
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
