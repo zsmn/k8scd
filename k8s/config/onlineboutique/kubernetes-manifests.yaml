@@ -911,6 +911,7 @@ spec:
   selector:
     matchLabels:
       app: adservice
+  replicas: 2
   template:
     metadata:
       labels:
