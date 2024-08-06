@@ -703,7 +703,7 @@ metadata:
   labels:
     app: frontend
     targetResourceUsage: "50"
-    resourceErrorMargin: "2"
+    resourceErrorMargin: "10"
 spec:
   selector:
     matchLabels:

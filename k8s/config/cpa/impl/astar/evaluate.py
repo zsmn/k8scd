@@ -92,15 +92,17 @@ def evaluate(spec):
     # Load the last metric from file
     last_metric = read_last_metric_from_file("last_metric.txt", average_utilization)
     target_replicas = current_replicas
+    evaluation = {}
 
     # Runs AsTAR algorithm
     if average_utilization >= target_average_utilization:
         target_replicas = high_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
+        evaluation["usageMode"] = "high_resource_usage"
     else:
         target_replicas = low_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
+        evaluation["usageMode"] = "low_resource_usage"
 
     # Build JSON dict with targetReplicas
-    evaluation = {}
     evaluation["targetReplicas"] = math.ceil(target_replicas)
 
     # Output JSON to stdout
