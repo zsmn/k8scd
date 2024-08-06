@@ -154,6 +154,10 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: replace
+        target_label: app
+        
     - job_name: zhpa-springboot-app
       metrics_path: /actuator/prometheus
       scrape_interval: 5s
