@@ -88,6 +88,12 @@ spec:
   gateways:
   - zhpa-springboot-app-gateway
   http:
-  - route:
+  - name: "routes"
+    match:
+    - uri:
+        prefix: "/test"
+    rewrite:
+      uri: "/"
+    route:
     - destination:
         host: zhpa-springboot-app
