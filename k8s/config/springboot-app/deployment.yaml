@@ -4,7 +4,10 @@ metadata:
   labels:
     run: zhpa-springboot-app
     targetResourceUsage: "50"
-    resourceErrorMargin: "2"
+    kp: "0.05"
+    ki: "0.001"
+    kd: "0"
+    max_integral: "1000"
   name: zhpa-springboot-app
 spec:
   selector:
@@ -89,11 +92,6 @@ spec:
   - zhpa-springboot-app-gateway
   http:
   - name: "routes"
-    match:
-    - uri:
-        prefix: "/test"
-    rewrite:
-      uri: "/"
     route:
     - destination:
         host: zhpa-springboot-app
