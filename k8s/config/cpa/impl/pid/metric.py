@@ -76,8 +76,8 @@ def metric(spec):
     sys.stdout.write(json.dumps(
         {
             "current_replicas": current_replicas,
-            "average_utilization": average_utilization,
-            "target_utilization": float(spec["resource"]["metadata"]["labels"]["targetResourceUsage"]),
+            "average_utilization": average_utilization/100.0,
+            "target_utilization": float(spec["resource"]["metadata"]["labels"]["targetResourceUsage"])/100.0,
             "kp": float(spec["resource"]["metadata"]["labels"]["kp"]),
             "ki": float(spec["resource"]["metadata"]["labels"]["ki"]),
             "kd": float(spec["resource"]["metadata"]["labels"]["kd"]),

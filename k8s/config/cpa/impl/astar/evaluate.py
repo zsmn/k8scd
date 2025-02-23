@@ -58,17 +58,19 @@ def read_last_metric_from_file(file_path: str, default_value=0.0):
     except IOError:
         return default_value
 
-def low_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int, error_margin: float):
-    if average_resource_utilization > last_average_resource_utilization + error_margin:
-        return current_replicas + 1
+def astar(target_goal: float, measured: float, current_replicas: int, hysteresis_band: float, previous_measure: float):
+    if(measured < (target_goal - hysteresis_band)):
+        if(measured > previous_measure):
+            return current_replicas + 1
+        else:
+            return current_replicas / 2
+    elif(measured > (target_goal + hysteresis_band)):
+        if(measured < previous_measure):
+            return current_replicas - 1
+        else:
+            return current_replicas * 2
     else:
-        return current_replicas / 2
-
-def high_resource_usage(average_resource_utilization: float, last_average_resource_utilization: float, current_replicas: int, error_margin: float):
-    if average_resource_utilization < last_average_resource_utilization - error_margin:
-        return current_replicas - 1
-    else:
-        return current_replicas * 2
+        return current_replicas
 
 def evaluate(spec):
     # Only expect 1 metric provided
@@ -95,12 +97,7 @@ def evaluate(spec):
     evaluation = {}
 
     # Runs AsTAR algorithm
-    if average_utilization >= target_average_utilization:
-        target_replicas = high_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
-        evaluation["usageMode"] = "high_resource_usage"
-    else:
-        target_replicas = low_resource_usage(average_utilization, last_metric, current_replicas, error_margin)
-        evaluation["usageMode"] = "low_resource_usage"
+    target_replicas = astar(target_average_utilization, average_utilization, current_replicas, hysteresis_band=error_margin, previous_measure=last_metric)
 
     # Build JSON dict with targetReplicas
     evaluation["targetReplicas"] = math.ceil(target_replicas)
@@ -109,7 +106,7 @@ def evaluate(spec):
     sys.stdout.write(json.dumps(evaluation))
 
     # Write last metric to file
-    write_last_metric_to_file("last_metric.txt", exponential_moving_average(average_utilization, last_metric))
+    write_last_metric_to_file("last_metric.txt", average_utilization)
 
 if __name__ == "__main__":
     main()

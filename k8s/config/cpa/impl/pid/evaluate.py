@@ -77,15 +77,18 @@ def evaluate(spec):
     max_integral = metric_value["max_integral"]
 
     # Load the last metric from file
-    last_it_controller = read_last_it_from_file("last_it.txt", PIDController(kp, ki, kd, target_average_utilization))
+    last_it_controller = read_last_it_from_file("last_it.txt", PIDController(kp, ki, kd, target_average_utilization, max_integral=max_integral))
     target_replicas = current_replicas
     evaluation = {}
 
     # Runs PID algorithm
-    target_replicas = current_replicas - last_it_controller.update(average_utilization, time.time())
+    pid_output = last_it_controller.update(average_utilization, time.time())
+    target_replicas = target_replicas + ((current_replicas * pid_output) * (-1))
 
     # Build JSON dict with targetReplicas
     evaluation["targetReplicas"] = round(target_replicas)
+    evaluation["pidOutput"] = pid_output
+    evaluation["replicasToIncrease"] = (current_replicas * pid_output) * (-1)
 
     # Output JSON to stdout
     sys.stdout.write(json.dumps(evaluation))
